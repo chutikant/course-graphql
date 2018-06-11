@@ -2,6 +2,7 @@ const { Post, User } = require('../models')
 
 const resolvers = {
     //step2: format data that will be rendered to user
+    // all data will map with typedefs
     Tag: {
         posts: async (tag) => {
             const posts = await Post.find({ tags: tag.name })
@@ -18,9 +19,6 @@ const resolvers = {
             return post.tags.map((tag) => {
                 return { name: tag }
             })
-        },
-        content: () => {
-            return 'pook:)'
         }
     },
     User: {
@@ -54,6 +52,7 @@ const resolvers = {
             return users
         },
         me: async (obj, args, context) => {
+            console.log(`me: ${context.user}` )
             return context.user
         }
     },
@@ -66,14 +65,20 @@ const resolvers = {
             const user = await User.signup(username, password)
             return user
         },
+        //resolver have 3 arguments:
+        //1. obj 
+        //2. argument that user passed 
+        //3.context is variable that to be shared all project. (ex. token)
         createPost: async (obj, { data }, context) => {
-            //const res = context.user
+            
+            if(context.user == null) {
+              // const errors = {'message': 'please login'}
+              throw new Error('User is not logged in (or authenticated).');
+               
+            }
             const res = await Post.createPost(data, context.user)
-            //console.log(res)
             return res
         }
-        // createPost : 
-        // args.data.
     }
 }
 

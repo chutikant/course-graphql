@@ -12,22 +12,25 @@ const logMiddleware = (req, res, next) => {
 }
 
 const postRoute = require('./routes/postRoute')
-const schema = require('./schema')
-
 // graphql apollo-server
-const {graphqlExpress , graphiqlExpress} = require('apollo-server-express')
+const { graphqlExpress, graphiqlExpress } = require('apollo-server-express')
 
+//**[ require graphql ]
+const graphqlHTTP = require('express-graphql')
+const schema = require('./schema')
 
 
 //use bodyParsor to send data from user
-app.use(authMiddleware)
 app.use(bodyParsor.json())
 app.use(bodyParsor.urlencoded({ extended: true }))
 
 app.use('/posts', postRoute)
-app.use(morgan('dev'))
 
-app.use('/graphql', graphqlExpress((req, res) =>{
+app.use(morgan('dev'))
+app.use(authMiddleware)
+
+
+app.use('/graphql', graphqlExpress((req, res) => {
     return {
         schema: schema,
         context: {
@@ -68,8 +71,8 @@ app.post('/login', async (req, res) => {
     return res.json({ token })
 })
 
-app.post('/me', authMiddleware,  (req,res) =>{
-    if(!req.user) {
+app.post('/me', (req, res) => {
+    if (!req.user) {
         return res.sendStatus(401)
     }
     res.json(req.user)

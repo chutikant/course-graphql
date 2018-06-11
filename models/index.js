@@ -7,11 +7,10 @@ mongoose.connect('mongodb://192.168.21.98:27017/redditclone_pook')
 
 const db = mongoose.connection
 
-db.once('open' , function(){
+db.once('open', function () {
     console.log('connected to dev');
-
 });
 
 module.exports = {
-    Post,User
+    Post, User
 }
