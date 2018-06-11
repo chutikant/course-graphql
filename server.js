@@ -12,6 +12,12 @@ const logMiddleware = (req, res, next) => {
 }
 
 const postRoute = require('./routes/postRoute')
+const schema = require('./schema')
+
+// graphql apollo-server
+const {graphqlExpress , graphiqlExpress} = require('apollo-server-express')
+
+
 
 //use bodyParsor to send data from user
 app.use(authMiddleware)
@@ -20,6 +26,19 @@ app.use(bodyParsor.urlencoded({ extended: true }))
 
 app.use('/posts', postRoute)
 app.use(morgan('dev'))
+
+app.use('/graphql', graphqlExpress((req, res) =>{
+    return {
+        schema: schema,
+        context: {
+            user: req.user
+        }
+    }
+}))
+
+app.use('/graphiql', graphiqlExpress({
+    endpointURL: '/graphql'
+}))
 
 app.post('/signup', async (req, res) => {
     const { username, password } = req.body

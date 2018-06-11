@@ -8,4 +8,5 @@ const postSchema =  mongoose.Schema({
     authorId: ObjectId
 }, { timestamp: true, versionkey: false })
 
+
 module.exports = mongoose.model('Post', postSchema);
