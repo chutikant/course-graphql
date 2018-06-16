@@ -5,6 +5,7 @@ const bodyParsor = require('body-parser')
 const { Post, User } = require('./models')
 const { authMiddleware } = require('./lib/auth')
 
+
 const morgan = require('morgan')
 const logMiddleware = (req, res, next) => {
     console.log(req.url)
@@ -18,6 +19,7 @@ const { graphqlExpress, graphiqlExpress } = require('apollo-server-express')
 //**[ require graphql ]
 const graphqlHTTP = require('express-graphql')
 const schema = require('./schema')
+const {createUserLoader, createPostsByUserIdLoader} = require('./loaders')
 
 
 //use bodyParsor to send data from user
@@ -31,9 +33,14 @@ app.use(authMiddleware)
 
 
 app.use('/graphql', graphqlExpress((req, res) => {
+
     return {
         schema: schema,
         context: {
+            loaders: {
+                userLoader: createUserLoader(),
+                postsByUserIdLoader: createPostsByUserIdLoader()
+            },
             user: req.user
         }
     }
