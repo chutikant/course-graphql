@@ -1,4 +1,36 @@
 const { Post, User } = require('../models')
+const DataLoader = require('dataloader');
+
+const userLoader = new DataLoader(async (keys) => {
+    const rows = await User.find({
+        _id: {$in: keys}
+    })
+
+    const results = keys.map((key) => {
+        return rows.find((row) => {
+            return `${row._id}`=== `${key}` 
+        }) 
+    })
+
+    return results
+}, {
+    cacheKeyFn: (key) => '${key}' //คีย์ที่ได้มาให้มองเป็นสตริงทั้งหมด ใช้ในการกำหนด catch key
+})
+
+const postsByUserIdLoader = new DataLoader(async (userIds) => {
+    const rows = await Post.find({
+        authorId : {$in: userIds}
+    })
+
+    const results = userIds.map((userId) => {
+        return rows.filter((row) => {
+            return `${row.authorId}`=== `${userId}` 
+        }) 
+    })
+
+    return results
+}, {cache: true,
+    cacheKeyFn: (userId) => '${userId}' }) 
 
 const resolvers = {
     //step2: format data that will be rendered to user
@@ -12,7 +44,8 @@ const resolvers = {
     Post: {
         id: (post) => { return post._id },
         author: async (post) => {
-            const user = await User.findById(post.authorId)
+            //const user = await User.findById(post.authorId) //change to dataLaoder
+            const user = await userLoader.load(post.authorId)
             return user
         },
         tags: (post) => {
@@ -24,7 +57,8 @@ const resolvers = {
     User: {
         id: (user) => { return user._id },
         posts: async (user) => {
-            const posts = await Post.find({ authorId: user._id })
+            const posts = await postsByUserIdLoader.load(user._id)
+          //  const posts = await Post.find({ authorId: user._id })
             return posts
         }
     },

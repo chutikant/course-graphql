@@ -3,7 +3,7 @@ const Post = require('./Post')
 const User = require('./User')
 
 mongoose.connect('mongodb://192.168.21.98:27017/redditclone_pook')
-//mongoose.set('debug',true)
+mongoose.set('debug',true)
 
 const db = mongoose.connection
 
