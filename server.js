@@ -5,6 +5,8 @@ const bodyParsor = require('body-parser')
 const { Post, User } = require('./models')
 const { authMiddleware } = require('./lib/auth')
 
+//cross origin
+const cors = require('cors')
 
 const morgan = require('morgan')
 const logMiddleware = (req, res, next) => {
@@ -21,6 +23,7 @@ const graphqlHTTP = require('express-graphql')
 const schema = require('./schema')
 const {createUserLoader, createPostsByUserIdLoader} = require('./loaders')
 
+app.use(cors()) //cross domain
 
 //use bodyParsor to send data from user
 app.use(bodyParsor.json())
